@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { getEvents } from "../../managers/EventManager"
+import { deleteEvent, getEvents, joinEvent, leaveEvent } from "../../managers/EventManager"
 
 
 export const EventList = (props) => {
@@ -8,9 +8,11 @@ export const EventList = (props) => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        getEvents().then(data => setEvents(data))
+        getAllEvents()
     }, [])
-
+const getAllEvents = ()=> {
+    getEvents().then(data => setEvents(data))
+}
     return (<>
     <button className="btn btn-2 btn-sep icon-create"
     onClick={() => {
@@ -21,10 +23,11 @@ export const EventList = (props) => {
             {
                 events.map(event => {
                     return <section key={`event--${event.id}`} className="event">
-                        <div>On {event.date} at {event.time}, we are playing {event.game}</div>
-                        <div>This is being organized by {event.organizer}</div>
                         <div>The theme is {event.description}</div>
-                        
+                        <button onClick={()=> navigate(`/events/details/${event.id}`)} className="btn">Event Details</button>
+                        <button onClick={() => deleteEvent(event.id).then(getAllEvents)} className="btn">Delete</button>
+                        {event.joined ? <button onClick={()=> leaveEvent(event.id).then(getAllEvents) }>Leave</button> 
+                        :<button onClick={()=> joinEvent(event.id).then(getAllEvents)}>Join</button>}
                     </section>
                 })
             }
